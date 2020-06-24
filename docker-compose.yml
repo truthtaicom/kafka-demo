@@ -1,63 +1,63 @@
 version: '3.2'
 
 services:
-  # elasticsearch:
-  #   container_name: elasticsearch
-  #   build:
-  #     context: docker/elasticsearch/
-  #     args:
-  #       ELK_VERSION: $ELK_VERSION
-  #   volumes:
-  #     - ./docker/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-  #     - elasticsearch:/usr/share/elasticsearch/data
-  #   ports:
-  #     - "9200:9200"
-  #     - "9300:9300"
-  #   environment:
-  #     ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-  #     ELASTIC_PASSWORD: "a1234567890"
-  #     # Use single node discovery in order to disable production mode and avoid bootstrap checks
-  #     # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
-  #     discovery.type: single-node
-  #   depends_on:
-  #     - kafka
-  #   networks:
-  #     - elk
+  elasticsearch:
+    container_name: elasticsearch
+    build:
+      context: docker/elasticsearch/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./docker/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: "a1234567890"
+      # Use single node discovery in order to disable production mode and avoid bootstrap checks
+      # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+      discovery.type: single-node
+    depends_on:
+      - kafka
+    networks:
+      - elk
 
-  # logstash:
-  #   container_name: logstash
-  #   build:
-  #     context: docker/logstash/
-  #     args:
-  #       ELK_VERSION: $ELK_VERSION
-  #   volumes:
-  #     - ./docker/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-  #     - ./docker/logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-  #   ports:
-  #     - "5000:5000/tcp"
-  #     - "5000:5000/udp"
-  #     - "9600:9600"
-  #   environment:
-  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-  #   networks:
-  #     - elk
-  #   depends_on:
-  #     - elasticsearch
+  logstash:
+    container_name: logstash
+    build:
+      context: docker/logstash/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./docker/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./docker/logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
 
-  # kibana:
-  #   container_name: kibana
-  #   build:
-  #     context: docker/kibana/
-  #     args:
-  #       ELK_VERSION: $ELK_VERSION
-  #   volumes:
-  #     - ./docker/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
-  #   ports:
-  #     - "5601:5601"
-  #   networks:
-  #     - elk
-  #   depends_on:
-  #     - elasticsearch
+  kibana:
+    container_name: kibana
+    build:
+      context: docker/kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - ./docker/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
 
   zookeeper:
     container_name: zookeeper
