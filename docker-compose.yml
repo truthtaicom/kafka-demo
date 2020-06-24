@@ -33,6 +33,7 @@ services:
     volumes:
       - ./docker/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
       - ./docker/logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logs:/usr/share/logs:ro
     ports:
       - "5000:5000/tcp"
       - "5000:5000/udp"
