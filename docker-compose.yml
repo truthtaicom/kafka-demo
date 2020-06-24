@@ -1,0 +1,121 @@
+version: '3.2'
+
+services:
+  # elasticsearch:
+  #   container_name: elasticsearch
+  #   build:
+  #     context: docker/elasticsearch/
+  #     args:
+  #       ELK_VERSION: $ELK_VERSION
+  #   volumes:
+  #     - ./docker/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+  #     - elasticsearch:/usr/share/elasticsearch/data
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+  #   environment:
+  #     ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #     ELASTIC_PASSWORD: "a1234567890"
+  #     # Use single node discovery in order to disable production mode and avoid bootstrap checks
+  #     # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
+  #     discovery.type: single-node
+  #   depends_on:
+  #     - kafka
+  #   networks:
+  #     - elk
+
+  # logstash:
+  #   container_name: logstash
+  #   build:
+  #     context: docker/logstash/
+  #     args:
+  #       ELK_VERSION: $ELK_VERSION
+  #   volumes:
+  #     - ./docker/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+  #     - ./docker/logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+  #   ports:
+  #     - "5000:5000/tcp"
+  #     - "5000:5000/udp"
+  #     - "9600:9600"
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #   networks:
+  #     - elk
+  #   depends_on:
+  #     - elasticsearch
+
+  # kibana:
+  #   container_name: kibana
+  #   build:
+  #     context: docker/kibana/
+  #     args:
+  #       ELK_VERSION: $ELK_VERSION
+  #   volumes:
+  #     - ./docker/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+  #   ports:
+  #     - "5601:5601"
+  #   networks:
+  #     - elk
+  #   depends_on:
+  #     - elasticsearch
+
+  zookeeper:
+    container_name: zookeeper
+    image: 'bitnami/zookeeper:3'
+    ports:
+      - '2181:2181'
+    volumes:
+      - 'zookeeper_data:/bitnami'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - elk
+  
+  kafka:
+    container_name: kafka
+    image: 'bitnami/kafka:2'
+    ports:
+      - '9092:9092'
+    volumes:
+      - 'kafka_data:/bitnami'
+    expose:
+     - "9093"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      ALLOW_PLAINTEXT_LISTENER: 'yes'
+      KAFKA_CREATE_TOPICS: "kafka-marx-geo,kafka-mobile-event"
+    depends_on:
+      - zookeeper
+    networks:
+      - elk
+
+  demo-kafka:
+    container_name: demo-kafka
+    ports:
+      - 3000:3000
+    build:
+      context: ./demo-kafka
+      dockerfile: Dockerfile
+    volumes:
+      - './logs:/usr/src/app/logs'
+      - './demo-kafka/src:/usr/src/app/src'
+    depends_on:
+      - zookeeper
+      - kafka
+    networks:
+      - elk
+
+networks:
+  elk:
+    driver: bridge
+
+volumes:
+  elasticsearch:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
