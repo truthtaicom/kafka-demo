@@ -1,7 +1,7 @@
 ## DEMO KAFKA + ELK SACK
-## UEH - DATA
+## UEH - IDT - DATA
 
-### Should have before start:
+### Should have before starting:
 - [Docker Desktop](https://www.docker.com/get-started)
 - ❤️ with Data 
 
@@ -19,4 +19,4 @@ User: elastic
 Password: a1234567890
 ```
 
-Made with ❤️ in UEH
+Made with ❤️ at UEH ( K29 )
