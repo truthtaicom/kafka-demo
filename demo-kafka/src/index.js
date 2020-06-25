@@ -36,7 +36,7 @@ const randomItemWithTime = async ([...items]) => {
   const randomNum = Math.floor(Math.random() * items.length)
   const item = items[randomNum];
   item.datetime = format(new Date(), 'dd-MM-yyyy HH:mm:ss')
-  console.log(">>>", item)
+
   const resortedItem = reOrderObjectByKey(item)
   const message = Object.values(resortedItem).join("|")
   return message
