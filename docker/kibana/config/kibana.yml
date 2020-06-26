@@ -12,4 +12,4 @@ monitoring.ui.container.elasticsearch.enabled: true
 elasticsearch.username: elastic
 elasticsearch.password: a1234567890
 
-xpack.reporting.enabled: true
+# xpack.reporting.enabled: true
